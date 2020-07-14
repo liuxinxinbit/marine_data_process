@@ -15,7 +15,6 @@ import tarfile
 import numpy as np
 import cv2
 from PIL import Image
-import data
 import os 
 import sys
 import glob
@@ -32,10 +31,10 @@ class RTNet:
         self.trainset  = self.read_traindata_names()
         self.num_train = len(self.trainset)
 
-    def read_traindata_names(self, file_path = "/dataset/newtrain"):
+    def read_traindata_names(self,):
         trainset=[]
         for i in range(12):
-            find_dir = '/home/liuxinxin/marine_data/'+ str(i+1) + '/images/'
+            find_dir = 'marine_data/'+ str(i+1) + '/images/'
             files = self.find_target_file(find_dir,'.json')
             trainset+=files
         return trainset
@@ -77,7 +76,7 @@ class RTNet:
         self.model.load_weights(file_path)
     
     #(0=Unlabeled, 1=sea, 2=sky, 3=boat)
-    def random_crop_or_pad(self, image, truth, size=(480, 640)):
+    def random_crop_or_pad(self, image, truth, size=(448, 512)):
         assert image.shape[:2] == truth.shape[:2]
 
         if image.shape[0] > size[0]:
@@ -105,17 +104,16 @@ class RTNet:
             truth = np.copy(zeros)            
 
         return image, truth
-    def BatchGenerator(self,batch_size=8, image_size=(480, 640, 3), labels=3):#500, 375
+    def BatchGenerator(self,batch_size=8, image_size=(448, 512, 3), labels=3):#500, 375
         while True:
             images = np.zeros((batch_size, image_size[0], image_size[1], image_size[2]))
             truths = np.zeros((batch_size, image_size[0], image_size[1], labels))
-
             for i in range(batch_size):
                 random_line = random.choice(self.trainset)
                 image,truth_mask,lbl_viz = self.json2data(random_line)
                 truth_mask=truth_mask+1
                 image, truth = self.random_crop_or_pad(image, truth_mask, image_size)
-                images[i] = image
+                images[i] = image/255
                 truths[i] = (np.arange(labels) == truth[...,None]-1).astype(int) # encode to one-hot-vector
             yield images, truths
             
@@ -138,7 +136,7 @@ class RTNet:
         return conv2d_deconv
 
     def build(self, use_cpu=False, print_summary=False):
-        inputs = Input(shape=(480, 640, 3))
+        inputs = Input(shape=(448, 512, 3))
             
         # initial layer
         conv2d_conv0_1 = self.build_conv2D_block(inputs,        filters = self.parameter[0],kernel_size=1,strides=1, block=0, i=0)
