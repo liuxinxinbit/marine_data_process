@@ -83,6 +83,7 @@ def random_crop_or_pad( image, truth, size=(480, 640)):
 #     img,lbl,lbl_viz = json2data(json_file)
 #     print(img.shape)
 #     plt.imshow(lbl_viz)
+
 #     plt.show()
 batch_size=8
 image_size=(448, 512, 3)

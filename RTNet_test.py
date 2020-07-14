@@ -30,6 +30,7 @@ def random_crop_or_pad(image, size=(448, 512)):
 
 
 rtnet = RTNet()
+
 # rtnet.train(epochs=10, steps_per_epoch=500, batch_size=4)
 # rtnet.save()
 

@@ -23,6 +23,7 @@ import matplotlib.pyplot as plt
 from labelme import utils
 import imgviz
 
+
 class RTNet:
     def __init__(self, train_stage=1,use_cpu=False, print_summary=False):
         self.train_stage = 1
