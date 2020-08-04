@@ -35,7 +35,7 @@ class RTNet:
     def read_traindata_names(self,):
         trainset=[]
         for i in range(12):
-            find_dir = 'marine_data/'+ str(i+1) + '/images/'
+            find_dir = '../marine_data/'+ str(i+1) + '/images/'
             files = self.find_target_file(find_dir,'.json')
             trainset+=files
         return trainset
