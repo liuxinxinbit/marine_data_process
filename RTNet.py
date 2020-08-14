@@ -1,3 +1,4 @@
+from DataArgument import data_augment
 import tensorflow as tf
 
 from tensorflow.keras import Model, Input
@@ -22,6 +23,7 @@ import json
 import matplotlib.pyplot as plt 
 from labelme import utils
 import imgviz
+from sklearn.preprocessing import StandardScaler
 
 
 class RTNet:
@@ -31,11 +33,12 @@ class RTNet:
         self.build(use_cpu=use_cpu, print_summary=print_summary)
         self.trainset  = self.read_traindata_names()
         self.num_train = len(self.trainset)
+        self.scaler = StandardScaler()
 
     def read_traindata_names(self,):
         trainset=[]
         for i in range(12):
-            find_dir = 'marine_data/'+ str(i+1) + '/images/'
+            find_dir = '../marine_data/'+ str(i+1) + '/images/'
             files = self.find_target_file(find_dir,'.json')
             trainset+=files
         return trainset
@@ -114,7 +117,9 @@ class RTNet:
                 image,truth_mask,lbl_viz = self.json2data(random_line)
                 truth_mask=truth_mask+1
                 image, truth = self.random_crop_or_pad(image, truth_mask, image_size)
-                images[i] = image/255
+                image, truth = data_augment(image, truth)
+                image = self.scaler.fit_transform(image.astype(np.float32).reshape(-1, 1)).reshape(-1, image.shape[0], image.shape[1], image.shape[2])
+                images[i] = image
                 truths[i] = (np.arange(labels) == truth[...,None]-1).astype(int) # encode to one-hot-vector
             yield images, truths
             

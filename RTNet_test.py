@@ -30,32 +30,21 @@ def random_crop_or_pad(image, size=(448, 512)):
 
 
 rtnet = RTNet()
-
-# rtnet.train(epochs=10, steps_per_epoch=500, batch_size=4)
-# rtnet.save()
+# rtnet.load()
+rtnet.train(epochs=5, steps_per_epoch=250, batch_size=6)
+rtnet.save()
 
 rtnet.load()
 start = time.time()
 for flag in range(500):
     print(str(flag).zfill(5))
-    image = np.float32(Image.open("marine_data/11/images/"+str(flag+1).zfill(5)+".jpg"))/255
+    image = np.float32(Image.open("../marine_data/11/images/"+str(flag+1).zfill(5)+".jpg"))/255
     image = random_crop_or_pad(image)
     plt.subplot(1, 2, 1)
     plt.imshow(image)
-    
-    prediction = rtnet.predict(image)
-    # print("1  ",time.time()-start)
-    result = np.zeros((448, 512))
-
-    a = prediction[0,:,:, 0]
-    b = prediction[0,:,:, 1]
-    c=  prediction[0,:,:, 2]
-    # result[np.multiply(a > b, a > c)] = 0
-    result[np.multiply(b > a, b > c)] = 1
-    result[np.multiply(c > a, c > b)] = 2
-
-
-    print("2  ",flag/(time.time()-start))
+    inputdata = rtnet.scaler.fit_transform(image.astype(np.float32).reshape(-1, 1)).reshape(-1, image.shape[0], image.shape[1], image.shape[2])[0,:,:,:]
+    prediction = rtnet.predict(inputdata)
+    result = np.argmax(prediction[0,:,:, :],-1)
     plt.subplot(1, 2, 2)
     plt.imshow(result)
     plt.pause(0.01)
