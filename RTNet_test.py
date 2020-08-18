@@ -31,14 +31,14 @@ def random_crop_or_pad(image, size=(448, 512)):
 
 rtnet = RTNet()
 # rtnet.load()
-rtnet.train(epochs=5, steps_per_epoch=250, batch_size=6)
-rtnet.save()
+# rtnet.train(epochs=5, steps_per_epoch=250, batch_size=6)
+# rtnet.save()
 
 rtnet.load()
 start = time.time()
 for flag in range(500):
     print(str(flag).zfill(5))
-    image = np.float32(Image.open("../marine_data/11/images/"+str(flag+1).zfill(5)+".jpg"))/255
+    image = np.float32(Image.open("../marine_data/2/images/"+str(flag+1).zfill(5)+".jpg"))/255
     image = random_crop_or_pad(image)
     plt.subplot(1, 2, 1)
     plt.imshow(image)
